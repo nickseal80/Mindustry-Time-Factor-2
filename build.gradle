@@ -17,7 +17,7 @@ java{
 
 ext{
     //the build number that this mod is made for
-    mindustryVersion = 'v155.4'
+    mindustryVersion = 'v154.3'
     jabelVersion = "93fde537c7"
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
@@ -85,7 +85,7 @@ jar{
     }
 }
 
-tasks.register('deploy', Jar){
+tasks.register('deployAndroid', Jar){
     dependsOn jarAndroid
     dependsOn jar
     archiveFileName = "${project.name}.jar"
@@ -97,4 +97,47 @@ tasks.register('deploy', Jar){
             delete "build/libs/${project.name}Android.jar"
         }
     }
+}
+
+tasks.register('deploy') {
+    dependsOn jar
+    doLast {
+        // Путь к папке модов в Windows
+        def modsDir = System.getenv('APPDATA') + '\\Mindustry\\mods'
+
+        // Создаем папку, если её нет
+        file(modsDir).mkdirs()
+
+        // Копируем JAR
+        def sourceFile = file("build/libs/${project.name}Desktop.jar")
+        def targetFile = file("$modsDir/time-factor.jar")
+
+        println "Копирование мода в: $targetFile"
+        copy {
+            from sourceFile
+            into modsDir
+            rename { "${project.name}.jar" }
+        }
+
+        println "✅ Мод скопирован! Запустите Mindustry вручную."
+    }
+}
+
+tasks.register('run', JavaExec) {
+    // Главный класс игры
+    mainClass = 'mindustry.desktop.DesktopLauncher'
+
+    // Classpath: ваш код + зависимости (Arc, Jabel)
+    classpath = sourceSets.main.runtimeClasspath
+
+    // Рабочая директория (где игра будет искать ресурсы)
+    workingDir = file("$buildDir/run")
+
+    // Создаём папку для ресурсов
+    doFirst {
+        workingDir.mkdirs()
+    }
+
+    // Выделяем память
+    jvmArgs '-Xmx1024m'
 }

@@ -1,14 +1,14 @@
 #the mod name as displayed in-game
-displayName: "Java Mod Template"
+displayName: "Time Factor"
 
 #the internal name of your mod
-name: "example-java-mod"
+name: "time-factor"
 
 #your name
-author: "You"
+author: "Seal"
 
 #the fully qualified main class of the mod
-main: "example.ExampleJavaMod"
+main: "org.seal.mindustry.timeFactor.TimeFactor"
 
 #the mod description as seen in the mod dialog
 description: "A Mindustry Java mod template."

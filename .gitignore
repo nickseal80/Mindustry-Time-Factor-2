@@ -1,4 +1,6 @@
+/.idea
 logs/
+/src/example
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
 /core/assets/bundles/output/
