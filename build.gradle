@@ -141,3 +141,7 @@ tasks.register('run', JavaExec) {
     // Выделяем память
     jvmArgs '-Xmx1024m'
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:-options']
+}

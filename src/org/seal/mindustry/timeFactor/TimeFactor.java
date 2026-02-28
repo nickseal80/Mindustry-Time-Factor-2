@@ -134,6 +134,19 @@ public class TimeFactor extends Mod {
 
         main.table(Tex.buttonEdge3, panel -> {
                     panel.name = "time-control-ui";
+                    Settings settings = new Settings(TimeFactor.this);
+
+                    slider.setMinVal(settings.getMinPos());
+                    slider.setMaxVal(settings.getMaxPos());
+
+                    ImageButton settingsBtn = new ImageButton(Icon.settings);
+                    settingsBtn.clicked(() -> {
+                        settings.showDialog();
+                        Log.info("Setting up time-control ui");
+                    });
+                    settingsBtn.getStyle().up = Tex.pane;
+                    settingsBtn.getStyle().over = Tex.flatDownBase;
+                    settingsBtn.getStyle().down = Tex.whitePane;
 
                     // Speed display label
                     Label label = new Label(pos2str());
@@ -151,14 +164,15 @@ public class TimeFactor extends Mod {
                     resetBtn.getStyle().down = Tex.whitePane;
 
                     // Add components to panel
-                    panel.add(label).size(60, 40).pad(5).padRight(15);
+                    panel.add(settingsBtn).size(40, 40).padRight(5);
+                    panel.add(label).size(60, 40).pad(5).padRight(5);
                     panel.add(resetBtn).size(40, 40).padRight(5);
 
                     // Add slider table
                     panel.add(slider.render()).pad(5);
                 })
                 .pad(10)
-                .size(380, 60);
+                .size(420, 60);
 
         main.left().bottom();
         Vars.ui.hudGroup.addChild(main);

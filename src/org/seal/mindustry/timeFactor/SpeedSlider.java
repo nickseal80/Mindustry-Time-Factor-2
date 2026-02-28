@@ -130,4 +130,20 @@ public class SpeedSlider {
     public TextButton getIncBtn() {
         return incBtn;
     }
+
+    public int getMinVal() {
+        return minVal;
+    }
+
+    public int getMaxVal() {
+        return maxVal;
+    }
+
+    public void setMinVal(int minVal) {
+        this.minVal = minVal;
+    }
+
+    public void setMaxVal(int maxVal) {
+        this.maxVal = maxVal;
+    }
 }
