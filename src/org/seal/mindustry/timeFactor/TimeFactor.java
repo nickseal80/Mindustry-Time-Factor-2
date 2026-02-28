@@ -119,7 +119,9 @@ public class TimeFactor extends Mod {
      * Positions the UI in the bottom-left corner of the screen.
      */
     private void createUI() {
-        slider = new SpeedSlider(position);
+        Settings settings = new Settings(TimeFactor.this);
+
+        slider = new SpeedSlider(position, settings.getMinPos(), settings.getMaxPos());
         slider.setListener(value -> {
             position = (int) value;
             updateGameSpeed();
@@ -134,10 +136,6 @@ public class TimeFactor extends Mod {
 
         main.table(Tex.buttonEdge3, panel -> {
                     panel.name = "time-control-ui";
-                    Settings settings = new Settings(TimeFactor.this);
-
-                    slider.setMinVal(settings.getMinPos());
-                    slider.setMaxVal(settings.getMaxPos());
 
                     ImageButton settingsBtn = new ImageButton(Icon.settings);
                     settingsBtn.clicked(() -> {

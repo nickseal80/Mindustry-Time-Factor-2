@@ -14,10 +14,10 @@ import mindustry.gen.Tex;
  */
 public class SpeedSlider {
     /** Minimum slider value (slowest speed: 1/16x) */
-    private int minVal = -4;
+    private int minVal;
 
     /** Maximum slider value (fastest speed: 16x) */
-    private int maxVal = 4;
+    private int maxVal;
 
     /** The main slider component */
     private final Slider slider;
@@ -37,7 +37,10 @@ public class SpeedSlider {
      *
      * @param defaultPosition Initial position value (should be between -4 and 4)
      */
-    public SpeedSlider(int defaultPosition) {
+    public SpeedSlider(int defaultPosition, int minVal, int maxVal) {
+        this.minVal = minVal;
+        this.maxVal = maxVal;
+
         slider = new Slider(minVal, maxVal, 1, false);
         slider.setValue(defaultPosition);
 
@@ -79,6 +82,33 @@ public class SpeedSlider {
         incBtn.getStyle().up = Tex.pane;
         incBtn.getStyle().over = Tex.flatDownBase;
         incBtn.getStyle().down = Tex.whitePane;
+    }
+
+    public void setRange(int minVal, int maxVal) {
+        this.minVal = minVal;
+        this.maxVal = maxVal;
+
+        // Сохраняем текущее значение
+        float currentValue = slider.getValue();
+
+        // Обновляем диапазон слайдера
+        slider.setRange(minVal, maxVal);
+
+        // Если текущее значение выходит за новые границы, корректируем его
+        if (currentValue < minVal) {
+            slider.setValue(minVal);
+            if (sliderListener != null) {
+                sliderListener.onValueChanged(minVal);
+            }
+        } else if (currentValue > maxVal) {
+            slider.setValue(maxVal);
+            if (sliderListener != null) {
+                sliderListener.onValueChanged(maxVal);
+            }
+        } else {
+            // Возвращаем сохраненное значение
+            slider.setValue(currentValue);
+        }
     }
 
     /**
@@ -129,21 +159,5 @@ public class SpeedSlider {
      */
     public TextButton getIncBtn() {
         return incBtn;
-    }
-
-    public int getMinVal() {
-        return minVal;
-    }
-
-    public int getMaxVal() {
-        return maxVal;
-    }
-
-    public void setMinVal(int minVal) {
-        this.minVal = minVal;
-    }
-
-    public void setMaxVal(int maxVal) {
-        this.maxVal = maxVal;
     }
 }
