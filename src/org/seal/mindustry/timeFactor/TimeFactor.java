@@ -11,9 +11,7 @@ import mindustry.Vars;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.mod.Mod;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.seal.mindustry.timeFactor.settings.Settings;
 
 /**
  * Main mod class for Time Factor - a Mindustry mod that allows real-time speed control.
@@ -24,78 +22,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class TimeFactor extends Mod {
 
-    /** Current speed position/index. Range: -4 (slowest) to 4 (fastest), 0 = normal speed. */
-    private int position = 0;
-
-    /** Thread-safe list of listeners that observe position changes. */
-    private final List<PositionListener> listeners = new CopyOnWriteArrayList<>();
+    private PositionManager positionManager;
 
     /** The speed slider UI component. */
     private SpeedSlider slider;
 
     /**
-     * Registers a listener to be notified when the speed position changes.
-     *
-     * @param listener The callback that will receive the new position value
-     * @see PositionListener
-     */
-    public void onPositionChange(PositionListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Unregisters a previously registered position listener.
-     *
-     * @param listener The listener to remove
-     */
-    public void removeListener(PositionListener listener) {
-        listeners.remove(listener);
-    }
-
-    /**
-     * Notifies all registered listeners about the current position change.
-     * Catches and logs individual listener errors to prevent one faulty listener
-     * from breaking the notification chain.
-     */
-    private void notifyListeners() {
-        for (PositionListener listener : listeners) {
-            try {
-                listener.onPositionChanged(position);
-            } catch (Exception e) {
-                Log.err("Error in position listener:", e);
-            }
-        }
-    }
-
-    /**
-     * Converts the current position value to a human-readable string representation.
-     *
-     * @return Formatted speed string (e.g., "x1", "x4", "x1/2")
-     */
-    private String pos2str() {
-        if (position >= 0) {
-            return "x" + (int) Math.pow(2, position);
-        } else {
-            return "x1/" + (int) Math.pow(2, Math.abs(position));
-        }
-    }
-
-    /**
-     * Sets a new speed position and triggers all listeners and game speed update.
-     *
-     * @param pos The new position value (must be between -4 and 4)
-     */
-    private void setPosition(int pos) {
-        this.position = pos;
-        notifyListeners();
-        updateGameSpeed();
-    }
-
-    /**
      * Updates the game's delta time provider based on the current speed position.
      * The delta is capped to prevent physics issues at extreme speeds.
      */
-    private void updateGameSpeed() {
+    private void updateGameSpeed(int position) {
         float speed = (float) Math.pow(2, position);
         Time.setDeltaProvider(() -> {
             float delta = Core.graphics.getDeltaTime();
@@ -109,8 +45,7 @@ public class TimeFactor extends Mod {
      */
     private void reset() {
         Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60, 3));
-        position = 0;
-        notifyListeners();
+        positionManager.setPosition(0);
     }
 
     /**
@@ -121,14 +56,13 @@ public class TimeFactor extends Mod {
     private void createUI() {
         Settings settings = new Settings(TimeFactor.this);
 
-        slider = new SpeedSlider(position, settings.getMinPos(), settings.getMaxPos());
+        slider = new SpeedSlider(positionManager.getPosition(), settings.getMinPos(), settings.getMaxPos());
         slider.setListener(value -> {
-            position = (int) value;
-            updateGameSpeed();
-            notifyListeners();
+            positionManager.setPosition((int)value);
         });
+        settings.setSlider(slider);
 
-        onPositionChange(newPosition -> {
+        positionManager.addListener(newPosition -> {
             slider.getSlider().setValue(newPosition);
         });
 
@@ -147,11 +81,11 @@ public class TimeFactor extends Mod {
                     settingsBtn.getStyle().down = Tex.whitePane;
 
                     // Speed display label
-                    Label label = new Label(pos2str());
+                    Label label = new Label(positionManager.pos2str());
                     label.setAlignment(Align.center);
 
-                    onPositionChange((newPosition) -> {
-                        label.setText(pos2str());
+                    positionManager.addListener(position -> {
+                        label.setText(positionManager.pos2str());
                     });
 
                     // Reset button with refresh icon
@@ -184,6 +118,10 @@ public class TimeFactor extends Mod {
      */
     @Override
     public void init() {
+        positionManager = new PositionManager();
+
+        positionManager.addListener(this::updateGameSpeed);
+
         Core.app.post(() -> {
             if (Vars.ui != null && Vars.ui.hudGroup != null) {
                 createUI();
