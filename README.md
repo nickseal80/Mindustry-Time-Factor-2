@@ -1,39 +1,52 @@
-# Mindustry Java Mod Template
-A Java Mindustry mod template that works on Android and PC. The Kotlin version of this mod can be seen [here](https://github.com/Anuken/MindustryKotlinModTemplate).
+# Time Factor - Mindustry Speed Control Mod
 
-## Building for Desktop Testing
+[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/seal/mindustry-time-factor)
+[![Mindustry](https://img.shields.io/badge/Mindustry-7.0+-brightgreen.svg)](https://github.com/Anuken/Mindustry)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-1. Install JDK **17**.
-2. Run `gradlew jar` [1].
-3. Your mod jar will be in the `build/libs` directory. **Only use this version for testing on desktop. It will not work with Android.**
-To build an Android-compatible version, you need the Android SDK. You can either let Github Actions handle this, or set it up yourself. See steps below.
+A lightweight and intuitive speed control mod for Mindustry that lets you adjust the game speed in real-time. Perfect for speeding up resource gathering, slowing down intense battles for better control, or practicing complex builds.
 
-## Building through Github Actions
+![Time Factor UI](screenshot.png)
 
-This repository is set up with Github Actions CI to automatically build the mod for you every commit. This requires a Github repository, for obvious reasons.
-To get a jar file that works for every platform, do the following:
-1. Make a Github repository with your mod name, and upload the contents of this repo to it. Perform any modifications necessary, then commit and push. 
-2. Check the "Actions" tab on your repository page. Select the most recent commit in the list. If it completed successfully, there should be a download link under the "Artifacts" section. 
-3. Click the download link (should be the name of your repo). This will download a **zipped jar** - **not** the jar file itself [2]! Unzip this file and import the jar contained within in Mindustry. This version should work both on Android and Desktop.
+## Features
 
-## Building Locally
+- 🎮 **Real-time Speed Control**: Adjust game speed instantly with a smooth slider
+- ⚡ **Wide Speed Range**: From 1/16x to 16x speed multiplier
+- 🎯 **Configurable Limits**: Customize minimum and maximum speed range
+- 🔄 **One-Click Reset**: Return to normal speed instantly
+- 💾 **Persistent Settings**: Your speed preferences are saved between sessions
+- 🎨 **Clean UI**: Compact interface that integrates seamlessly with the HUD
+- 📱 **Multi-platform**: Works on both desktop and Android versions
 
-Building locally takes more time to set up, but shouldn't be a problem if you've done Android development before.
-1. Download the Android SDK, unzip it and set the `ANDROID_HOME` environment variable to its location.
-2. Make sure you have API level 30 installed, as well as any recent version of build tools (e.g. 30.0.1)
-3. Add a build-tools folder to your PATH. For example, if you have `30.0.1` installed, that would be `$ANDROID_HOME/build-tools/30.0.1`.
-4. Run `gradlew deploy`. If you did everything correctlly, this will create a jar file in the `build/libs` directory that can be run on both Android and desktop. 
+## Speed Levels
 
-## Adding Dependencies
+| Position | Speed | Display |
+|:--------:|:-----:|:-------:|
+| -4 | 1/16x | x1/16 |
+| -3 | 1/8x  | x1/8  |
+| -2 | 1/4x  | x1/4  |
+| -1 | 1/2x  | x1/2  |
+| 0  | 1x    | x1    |
+| 1  | 2x    | x2    |
+| 2  | 4x    | x4    |
+| 3  | 8x    | x8    |
+| 4  | 16x   | x16   |
 
-Please note that all dependencies on Mindustry, Arc or its submodules **must be declared as compileOnly in Gradle**. Never use `implementation` for core Mindustry or Arc dependencies. 
+*Note: The range can be extended up to ±6 (1/64x to 64x) through settings.*
 
-- `implementation` **places the entire dependency in the jar**, which is, in most mod dependencies, very undesirable. You do not want the entirety of the Mindustry API included with your mod.
-- `compileOnly` means that the dependency is only around at compile time, and not included in the jar.
+## Usage
 
-Only use `implementation` if you want to package another Java library *with your mod*, and that library is not present in Mindustry already.
+1. **Launch the game** and load a save or start a new game
+2. **Find the control panel** in the bottom-left corner of the screen
+3. **Adjust speed** using:
+    - The slider for precise control
+    - +/- buttons for step adjustment
+4. **Reset to normal** with the refresh button (↻)
+5. **Configure range** with the settings button (⚙️)
 
---- 
+### Settings Dialog
 
-*[1]* *On Linux/Mac it's `./gradlew`, but if you're using Linux I assume you know how to run executables properly anyway.*  
-*[2]: Yes, I know this is stupid. It's a Github UI limitation - while the jar itself is uploaded unzipped, there is currently no way to download it as a single file.*
+The settings dialog allows you to:
+- Adjust the minimum speed (e.g., -6 for 1/64x)
+- Adjust the maximum speed (e.g., 6 for 64x)
+- Changes are saved automatically

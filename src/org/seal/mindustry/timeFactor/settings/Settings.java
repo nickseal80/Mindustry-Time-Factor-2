@@ -9,13 +9,27 @@ import arc.util.serialization.JsonValue;
 import mindustry.Vars;
 import mindustry.ui.dialogs.BaseDialog;
 import arc.util.Log;
-import org.seal.mindustry.timeFactor.PositionManager;
 import org.seal.mindustry.timeFactor.SpeedSlider;
 import org.seal.mindustry.timeFactor.TimeFactor;
 
+/**
+ * Manages mod settings including min/max speed range.
+ * Handles persistent storage of settings using JSON.
+ * Provides a configuration dialog for user interaction.
+ *
+ * @author Seal
+ * @version 1.0
+ */
 public class Settings {
+
+    /**
+     * Internal class representing the settings data structure.
+     */
     public static class BaseSettings {
+        /** Minimum speed position (negative = slower speeds) */
         public int minPos = -4;
+
+        /** Maximum speed position (positive = faster speeds) */
         public int maxPos = 4;
     }
 
@@ -25,12 +39,18 @@ public class Settings {
     private final TimeFactor mod;
     private SpeedSlider slider;
 
+    /**
+     * Creates a new Settings instance for the specified mod.
+     * Loads existing settings and creates the configuration dialog.
+     *
+     * @param mod The main mod instance
+     */
     public Settings(TimeFactor mod) {
-        this.json = new Json(); // Инициализируем один раз
+        this.json = new Json();
         this.mod = mod;
-        this.settings = new BaseSettings(); // Инициализируем
+        this.settings = new BaseSettings();
 
-        // Регистрируем сериализатор в НАШЕМ экземпляре json
+        // Configure JSON serializer for BaseSettings
         json.setSerializer(BaseSettings.class, new Json.Serializer<BaseSettings>() {
             @Override
             public void write(Json json, BaseSettings object, Class knownType) {
@@ -49,8 +69,12 @@ public class Settings {
             }
         });
 
-        loadSettings(); // Загружаем после регистрации сериализатора
+        loadSettings();
 
+        /*
+         * Creates the settings dialog with min/max speed controls.
+         * TODO: set createUI() method
+         */
         TFSlider minValSlider = new TFSlider(-6, 0);
         minValSlider.setValue(settings.minPos);
         Label minValLabel = new Label(minValSlider.getSpeed());
@@ -98,14 +122,24 @@ public class Settings {
         });
     }
 
+    /**
+     * Displays the settings dialog.
+     */
     public void showDialog() {
         dialog.show();
     }
 
+    /**
+     * Closes the settings dialog.
+     */
     public void closeDialog() {
         dialog.hide();
     }
 
+    /**
+     * Loads settings from persistent storage.
+     * If no settings file exists, creates default settings.
+     */
     public void loadSettings() {
         Fi file = Vars.mods.getConfig(mod);
         if (file.exists()) {
@@ -121,10 +155,13 @@ public class Settings {
         } else {
             Log.info("No settings file, using defaults");
             settings = new BaseSettings();
-            saveSettings(); // Сохраняем defaults
+            saveSettings();
         }
     }
 
+    /**
+     * Saves current settings to persistent storage.
+     */
     public void saveSettings() {
         try {
             Fi file = Vars.mods.getConfig(mod);
@@ -139,15 +176,26 @@ public class Settings {
         }
     }
 
+    /**
+     * Sets the main speed slider to update when settings change.
+     *
+     * @param slider The main speed slider instance
+     */
     public void setSlider(SpeedSlider slider) {
         this.slider = slider;
     }
 
-    // Геттеры для доступа к настройкам
+    /** @return The current minimum position value */
     public int getMinPos() {return settings.minPos;}
 
+    /** @return The current maximum position value */
     public int getMaxPos() {return settings.maxPos;}
 
+    /**
+     * Sets the minimum position and saves settings.
+     *
+     * @param minPos New minimum position value
+     */
     public void setMinPos(int minPos) {
         if (settings.minPos != minPos) {
             settings.minPos = minPos;
@@ -155,6 +203,11 @@ public class Settings {
         }
     }
 
+    /**
+     * Sets the maximum position and saves settings.
+     *
+     * @param maxPos New maximum position value
+     */
     public void setMaxPos(int maxPos) {
         if (settings.maxPos != maxPos) {
             settings.maxPos = maxPos;

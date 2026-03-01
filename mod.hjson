@@ -14,7 +14,7 @@ main: "org.seal.mindustry.timeFactor.TimeFactor"
 description: "A Mindustry Java mod template."
 
 #the mod version
-version: 1.1
+version: 1.0
 
 #the minimum game build required to run this mod
 minGameVersion: 154

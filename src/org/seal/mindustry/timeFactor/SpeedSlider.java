@@ -44,20 +44,17 @@ public class SpeedSlider {
         slider = new Slider(minVal, maxVal, 1, false);
         slider.setValue(defaultPosition);
 
-        // Handle slider movement
         slider.moved(value -> {
             if (sliderListener != null) {
                 sliderListener.onValueChanged(value);
             }
         });
 
-        // Decrement button
         decBtn = new TextButton("<");
         decBtn.clicked(() -> {
             float currentValue = slider.getValue();
-            if (slider.getValue() > minVal) {
+            if (currentValue > getMinVal()) {
                 slider.setValue(currentValue - 1);
-
                 if (sliderListener != null) {
                     sliderListener.onValueChanged(slider.getValue());
                 }
@@ -67,13 +64,11 @@ public class SpeedSlider {
         decBtn.getStyle().over = Tex.flatDownBase;
         decBtn.getStyle().down = Tex.whitePane;
 
-        // Increment button
         incBtn = new TextButton(">");
         incBtn.clicked(() -> {
             float currentValue = slider.getValue();
-            if (slider.getValue() < maxVal) {
+            if (currentValue < getMaxVal()) {
                 slider.setValue(currentValue + 1);
-
                 if (sliderListener != null) {
                     sliderListener.onValueChanged(slider.getValue());
                 }
@@ -84,17 +79,20 @@ public class SpeedSlider {
         incBtn.getStyle().down = Tex.whitePane;
     }
 
+    /**
+     * Updates the range of the slider and adjusts current value if needed.
+     *
+     * @param minVal New minimum value
+     * @param maxVal New maximum value
+     */
     public void setRange(int minVal, int maxVal) {
         this.minVal = minVal;
         this.maxVal = maxVal;
 
-        // Сохраняем текущее значение
         float currentValue = slider.getValue();
 
-        // Обновляем диапазон слайдера
         slider.setRange(minVal, maxVal);
 
-        // Если текущее значение выходит за новые границы, корректируем его
         if (currentValue < minVal) {
             slider.setValue(minVal);
             if (sliderListener != null) {
@@ -106,30 +104,18 @@ public class SpeedSlider {
                 sliderListener.onValueChanged(maxVal);
             }
         } else {
-            // Возвращаем сохраненное значение
             slider.setValue(currentValue);
         }
     }
 
-    /**
-     * Renders the complete slider component with buttons in a table layout.
-     *
-     * @return A Table containing the decrement button, slider, and increment button
-     */
     public Table render() {
         Table table = new Table();
         table.add(decBtn).size(40, 40);
         table.add(slider).growX().height(40);
         table.add(incBtn).size(40, 40);
-
         return table;
     }
 
-    /**
-     * Sets the listener for slider value changes.
-     *
-     * @param sliderListener The listener that will receive value change events
-     */
     public void setListener(SliderListener sliderListener) {
         this.sliderListener = sliderListener;
     }
