@@ -1,14 +1,16 @@
 #the mod name as displayed in-game
-displayName: "Time Factor"
+displayName: "Time Factor 2"
 
 #the internal name of your mod
-name: "time-factor"
+name: "time-factor 2"
 
 #your name
 author: "Seal"
 
 #the fully qualified main class of the mod
 main: "org.seal.mindustry.timeFactor.TimeFactor"
+
+repo: "https://github.com/nickseal80/Mindustry-Time-Factor-2"
 
 #the mod description as seen in the mod dialog
 description: "A Mindustry Java mod template."
