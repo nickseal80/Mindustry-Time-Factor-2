@@ -64,13 +64,13 @@ tasks.register('jarAndroid'){
         def d8 = isWindows ? "d8.bat" : "d8"
 
         //dex and desugar files - this requires d8 in your PATH
-        "$d8 $dependencies --min-api 14 --output ${project.name}Android.jar ${project.name}Desktop.jar"
+        "$d8 $dependencies --min-api 14 --output timeFactorAndroid.jar timeFactorDesktop.jar"
                 .execute(null, new File("build/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
 jar{
-    archiveFileName = "${project.name}Desktop.jar"
+    archiveFileName = "timeFactorDesktop.jar"
 
     from{
         configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
@@ -88,13 +88,13 @@ jar{
 tasks.register('deployAndroid', Jar){
     dependsOn jarAndroid
     dependsOn jar
-    archiveFileName = "${project.name}.jar"
+    archiveFileName = "timeFactor.jar"
 
-    from{ [zipTree("build/libs/${project.name}Desktop.jar"), zipTree("build/libs/${project.name}Android.jar")] }
+    from{ [zipTree("build/libs/timeFactorDesktop.jar"), zipTree("build/libs/timeFactorAndroid.jar")] }
 
     doLast{
         delete{
-            delete "build/libs/${project.name}Android.jar"
+            delete "build/libs/timeFactorAndroid.jar"
         }
     }
 }
@@ -109,14 +109,14 @@ tasks.register('deploy') {
         file(modsDir).mkdirs()
 
         // Копируем JAR
-        def sourceFile = file("build/libs/${project.name}Desktop.jar")
-        def targetFile = file("$modsDir/time-factor.jar")
+        def sourceFile = file("build/libs/timeFactorDesktop.jar")
+        def targetFile = file("$modsDir/timeFactorDesktop.jar")
 
         println "Копирование мода в: $targetFile"
         copy {
             from sourceFile
             into modsDir
-            rename { "${project.name}.jar" }
+            rename { "timeFactor.jar" }
         }
 
         println "✅ Мод скопирован! Запустите Mindustry вручную."

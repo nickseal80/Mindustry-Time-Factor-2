@@ -4,6 +4,7 @@ import arc.scene.ui.Slider;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import mindustry.gen.Tex;
+import org.seal.mindustry.timeFactor.api.SliderListener;
 
 /**
  * A custom UI component that combines a slider with increment/decrement buttons

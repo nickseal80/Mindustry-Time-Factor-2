@@ -1,6 +1,9 @@
 package org.seal.mindustry.timeFactor;
 
 import arc.util.Log;
+import org.seal.mindustry.timeFactor.api.PositionController;
+import org.seal.mindustry.timeFactor.api.PositionListener;
+import org.seal.mindustry.timeFactor.util.TimeSpeedFormat;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Manages the speed position and notifies listeners about changes.
  * Uses CopyOnWriteArrayList for thread-safe listener management.
  */
-public class PositionManager {
+public class PositionManager implements PositionController {
 
     /** Current speed position. Range: -4 to 4, 0 = normal speed */
     private int position;
@@ -36,6 +39,7 @@ public class PositionManager {
      * Gets current position
      * @return Current position value
      */
+    @Override
     public int getPosition() {
         return position;
     }
@@ -44,6 +48,7 @@ public class PositionManager {
      * Sets new position and notifies all listeners
      * @param newPosition New position value
      */
+    @Override
     public void setPosition(int newPosition) {
         if (this.position != newPosition) {
             this.position = newPosition;
@@ -55,6 +60,7 @@ public class PositionManager {
      * Adds a listener to receive position change notifications
      * @param listener The listener to add
      */
+    @Override
     public void addListener(PositionListener listener) {
         if (listener != null && !this.listeners.contains(listener)) {
             this.listeners.add(listener);
@@ -66,6 +72,7 @@ public class PositionManager {
      * Removes a listener
      * @param listener The listener to remove
      */
+    @Override
     public void removeListener(PositionListener listener) {
         if (listener != null) {
             this.listeners.remove(listener);
@@ -76,6 +83,7 @@ public class PositionManager {
     /**
      * Removes all listeners
      */
+    @Override
     public void clearListeners() {
         this.listeners.clear();
         Log.debug("All position listeners cleared");
@@ -99,11 +107,8 @@ public class PositionManager {
      * Converts position to human-readable speed string
      * @return Formatted speed string (e.g., "x1", "x4", "x1/2")
      */
+    @Override
     public String pos2str() {
-        if (position >= 0) {
-            return "x" + (int) Math.pow(2, position);
-        } else {
-            return "x1/" + (int) Math.pow(2, Math.abs(position));
-        }
+        return TimeSpeedFormat.pos2str(position);
     }
 }

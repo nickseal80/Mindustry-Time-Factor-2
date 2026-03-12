@@ -1,4 +1,4 @@
-package org.seal.mindustry.timeFactor;
+package org.seal.mindustry.timeFactor.api;
 
 /**
  * Listener interface for receiving speed position change events.

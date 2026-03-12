@@ -13,7 +13,7 @@ main: "org.seal.mindustry.timeFactor.TimeFactor"
 repo: "https://github.com/nickseal80/Mindustry-Time-Factor-2"
 
 #the mod description as seen in the mod dialog
-description: "A Mindustry Java mod template."
+description: "Real-time speed control for Mindustry. Customize speed limits and reset instantly with a clean UI."
 
 #the mod version
 version: 1.0
