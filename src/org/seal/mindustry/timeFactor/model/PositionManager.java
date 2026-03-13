@@ -1,4 +1,4 @@
-package org.seal.mindustry.timeFactor;
+package org.seal.mindustry.timeFactor.model;
 
 import arc.util.Log;
 import org.seal.mindustry.timeFactor.api.PositionController;
