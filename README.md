@@ -6,7 +6,7 @@
 
 A lightweight and intuitive speed control mod for Mindustry that lets you adjust the game speed in real-time. Perfect for speeding up resource gathering, slowing down intense battles for better control, or practicing complex builds.
 
-![Time Factor UI](screenshot.png)
+![Time Factor UI](images/screenshot.png)
 
 ## Features
 
