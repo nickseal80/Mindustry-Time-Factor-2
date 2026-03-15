@@ -39,11 +39,11 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
         dlg.cont.table(grid -> {
             grid.defaults().pad(5);
 
-            grid.add(minRangeSlider).growX();
+            grid.add(minRangeSlider);
             grid.add(minRangeLabel).width(60).right();
             grid.row();
 
-            grid.add(maxRangeSlider).growX();
+            grid.add(maxRangeSlider);
             grid.add(maxRangeLabel).width(60).right();
             grid.row();
         }).growX().pad(10);

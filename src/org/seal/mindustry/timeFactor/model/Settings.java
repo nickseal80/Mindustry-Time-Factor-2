@@ -32,7 +32,7 @@ public class Settings implements SettingsController {
         this.settings = new BaseSettings();
 
         // Configure JSON serializer for BaseSettings - ИСПРАВЛЕНО: убраны лишние package paths
-        json.setSerializer(BaseSettings.class, new Json.Serializer<BaseSettings>() {
+        json.setSerializer(BaseSettings.class, new Json.Serializer<>() {
             @Override
             public void write(Json json, BaseSettings object, Class knownType) {
                 json.writeObjectStart();
@@ -61,6 +61,14 @@ public class Settings implements SettingsController {
                 Log.err(e);
             }
         }
+    }
+
+    /**
+     * Get current settings object for listeners
+     */
+    @Override
+    public BaseSettings getSettings() {
+        return settings;
     }
 
     @Override

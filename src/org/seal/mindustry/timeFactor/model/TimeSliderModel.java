@@ -28,7 +28,10 @@ public class TimeSliderModel implements TimeSliderController {
 
     @Override
     public void setValue(int value) {
-        this.value = value;
+        if (this.value != value && value >= minValue && value <= maxValue) {
+            this.value = value;
+            notifyListeners();
+        }
     }
 
     @Override
@@ -44,13 +47,31 @@ public class TimeSliderModel implements TimeSliderController {
     @Override
     public void setRange(int min, int max) {
         validateRange(min, max);
+
+        boolean rangeChanged = this.minValue != min || this.maxValue != max;
+
         this.minValue = min;
         this.maxValue = max;
+
+        // Adjust current value if it's out of new range
+        int oldValue = this.value;
+        if (value < min) {
+            this.value = min;
+        } else if (value > max) {
+            this.value = max;
+        }
+
+        // Уведомляем слушателей, если изменилось значение или диапазон
+        if (rangeChanged || oldValue != this.value) {
+            notifyListeners();
+        }
     }
 
     @Override
     public void addListener(SliderListener listener) {
         listeners.add(listener);
+        // Immediately notify new listener of current value
+        listener.onValueChanged(value);
     }
 
     @Override
