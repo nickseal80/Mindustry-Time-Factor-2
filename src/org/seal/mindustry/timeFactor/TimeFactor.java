@@ -26,7 +26,7 @@ import org.seal.mindustry.timeFactor.util.TimeSpeedFormat;
  * Adds a UI slider to adjust game speed from 1/16x to 16x.
  *
  * @author Seal
- * @version 2.0
+ * @version 2.1
  */
 public class TimeFactor extends Mod {
 
