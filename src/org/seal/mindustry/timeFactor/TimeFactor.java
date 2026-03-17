@@ -35,6 +35,16 @@ public class TimeFactor extends Mod {
     private TimeSliderView sliderView;
     private SettingsDialog settingsDialog;
 
+    private boolean expanded = true;
+    private Table main;
+    private Table collapsedMain;
+
+    // Текущий активный UI элемент в HUD
+    private Table activeUI;
+
+    // Лейбл для свёрнутого режима (нужен для обновления)
+    private Label collapsedLabel;
+
     /**
      * Updates the game's delta time provider based on the current speed position.
      * The delta is capped to prevent physics issues at extreme speeds.
@@ -80,7 +90,7 @@ public class TimeFactor extends Mod {
             sliderModel.setValue(newPosition);
         });
 
-        // ✅ ВАЖНО: Update slider model when settings change
+        // Update slider model when settings change
         settingsController.addListener(settings -> {
             sliderModel.setRange(settings.minPos, settings.maxPos);
         });
@@ -91,51 +101,128 @@ public class TimeFactor extends Mod {
     }
 
     /**
-     * Creates and initializes the user interface.
+     * Initializes both UI variants.
      */
-    private void createUI() {
-        Table main = new Table();
+    private void initUI() {
+        this.main = createUIFull();
+        this.collapsedMain = createUICollapsed();
+    }
 
-        main.table(Tex.buttonEdge3, panel -> {
-                    panel.name = "time-control-ui";
+    /**
+     * Creates the full expanded UI with all controls.
+     */
+    private Table createUIFull() {
+        Table container = new Table();
 
-                    // Settings button
-                    ImageButton settingsBtn = new ImageButton(Icon.settings);
-                    settingsBtn.clicked(() -> {
-                        settingsDialog.showDialog();
-                        Log.info("Opening settings dialog");
-                    });
-                    styleButton(settingsBtn);
+        container.table(Tex.pane, panel -> {
+            panel.name = "time-control-ui-full";
 
-                    // Speed display label
-                    Label label = new Label(positionController.pos2str());
-                    label.setAlignment(Align.center);
+            // Settings button
+            ImageButton settingsBtn = new ImageButton(Icon.settings);
+            settingsBtn.clicked(() -> settingsDialog.showDialog());
+            styleButton(settingsBtn);
 
-                    // Update label when position changes
-                    positionController.addListener(position -> {
-                        label.setText(positionController.pos2str());
-                    });
+            // Speed display label
+            Label label = new Label(positionController.pos2str());
+            label.setAlignment(Align.center);
+            positionController.addListener(position ->
+                    label.setText(positionController.pos2str())
+            );
 
-                    // Reset button
-                    ImageButton resetBtn = new ImageButton(Icon.refresh);
-                    resetBtn.clicked(this::reset);
-                    styleButton(resetBtn);
+            // Reset button
+            ImageButton resetBtn = new ImageButton(Icon.refresh);
+            resetBtn.clicked(this::reset);
+            styleButton(resetBtn);
 
-                    // Add components to panel
-                    panel.add(settingsBtn).size(40, 40).padRight(5);
-                    panel.add(label).size(60, 40).pad(5).padRight(5);
-                    panel.add(resetBtn).size(40, 40).padRight(5);
+            // Collapse button
+            ImageButton collapseBtn = new ImageButton(Icon.upOpenSmall);
+            styleButton(collapseBtn);
+            collapseBtn.clicked(() -> {
+                expanded = false;
+                switchUI();
+            });
 
-                    // Add slider view
-                    panel.add(sliderView.render()).pad(5);
-                })
-                .pad(10)
-                .size(440, 60); // Slightly larger for settings button
+            // Add components
+            panel.add(settingsBtn).size(40, 40).padRight(5);
+            panel.add(label).size(60, 40).pad(5).padRight(5);
+            panel.add(resetBtn).size(40, 40).padRight(5);
+            panel.add(sliderView.render()).padRight(5);
+            panel.add(collapseBtn).size(20, 20).padLeft(7).right().padTop(5).top();
 
-        main.left().bottom();
-        Vars.ui.hudGroup.addChild(main);
+        }).pad(10, 10, 10, 0).size(440, 60);
 
-        Log.info("TimeFactor UI created successfully");
+        container.left().bottom();
+        return container;
+    }
+
+    /**
+     * Creates the collapsed UI with only speed display.
+     */
+    private Table createUICollapsed() {
+        Table container = new Table();
+
+        container.table(Tex.pane, panel -> {
+            panel.name = "time-control-ui-collapsed";
+
+            // Speed label
+            collapsedLabel = new Label(positionController.pos2str());
+            collapsedLabel.setAlignment(Align.center);
+
+            positionController.addListener(position ->
+                    collapsedLabel.setText(positionController.pos2str())
+            );
+
+            // Делаем панель кликабельной с курсором-рукой
+            panel.clicked(() -> {
+                expanded = true;
+                switchUI();
+            });
+
+            panel.add(collapsedLabel).size(60, 40).pad(5);
+
+        }).pad(10).size(100, 60);
+
+        container.left().bottom();
+        return container;
+    }
+
+    /**
+     * Switches between expanded and collapsed UI.
+     */
+    private void switchUI() {
+        if (activeUI == null || Vars.ui == null || Vars.ui.hudGroup == null) {
+            return;
+        }
+
+        Log.info("Switching UI to " + (expanded ? "expanded" : "collapsed") + " mode");
+
+        // Удаляем текущий UI из HUD
+        Vars.ui.hudGroup.removeChild(activeUI);
+
+        // Выбираем новую панель
+        activeUI = expanded ? main : collapsedMain;
+
+        // Добавляем новую панель в HUD
+        Vars.ui.hudGroup.addChild(activeUI);
+
+        // Перестраиваем
+        Vars.ui.hudGroup.invalidate();
+        Vars.ui.hudGroup.layout();
+    }
+
+    /**
+     * Renders the initial UI based on expanded state.
+     */
+    private void render() {
+        initUI();
+
+        // Выбираем начальную панель
+        activeUI = expanded ? main : collapsedMain;
+
+        // Добавляем в HUD
+        Vars.ui.hudGroup.addChild(activeUI);
+
+        Log.info("TimeFactor UI rendered in " + (expanded ? "expanded" : "collapsed") + " mode");
     }
 
     /**
@@ -161,7 +248,7 @@ public class TimeFactor extends Mod {
         // Schedule UI creation on main thread
         Core.app.post(() -> {
             if (Vars.ui != null && Vars.ui.hudGroup != null) {
-                createUI();
+                render();
             }
         });
 
