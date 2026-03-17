@@ -1,6 +1,7 @@
 package org.seal.mindustry.timeFactor;
 
 import arc.Core;
+import arc.scene.actions.Actions;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
@@ -196,18 +197,24 @@ public class TimeFactor extends Mod {
 
         Log.info("Switching UI to " + (expanded ? "expanded" : "collapsed") + " mode");
 
-        // Удаляем текущий UI из HUD
-        Vars.ui.hudGroup.removeChild(activeUI);
+        // Анимация затухания текущей панели
+        activeUI.actions(
+                Actions.fadeOut(0.15f),
+                Actions.run(() -> {
+                    // Удаляем старую панель после затухания
+                    Vars.ui.hudGroup.removeChild(activeUI);
 
-        // Выбираем новую панель
-        activeUI = expanded ? main : collapsedMain;
+                    // Выбираем новую панель
+                    activeUI = expanded ? main : collapsedMain;
+                    activeUI.setColor(1, 1, 1, 0); // Прозрачная в начале
 
-        // Добавляем новую панель в HUD
-        Vars.ui.hudGroup.addChild(activeUI);
+                    // Добавляем новую панель
+                    Vars.ui.hudGroup.addChild(activeUI);
 
-        // Перестраиваем
-        Vars.ui.hudGroup.invalidate();
-        Vars.ui.hudGroup.layout();
+                    // Анимация появления
+                    activeUI.actions(Actions.fadeIn(0.15f));
+                })
+        );
     }
 
     /**
