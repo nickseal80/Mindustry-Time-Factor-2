@@ -4,6 +4,7 @@ import arc.Core;
 import arc.scene.actions.Actions;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
+import arc.scene.ui.Tooltip;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import arc.util.Log;
@@ -19,6 +20,7 @@ import org.seal.mindustry.timeFactor.model.Settings;
 import org.seal.mindustry.timeFactor.model.TimeSliderModel;
 import org.seal.mindustry.timeFactor.ui.SettingsDialog;
 import org.seal.mindustry.timeFactor.ui.TimeSliderView;
+import org.seal.mindustry.timeFactor.util.Localization;
 import org.seal.mindustry.timeFactor.util.TimeSpeedFormat;
 
 /**
@@ -122,6 +124,10 @@ public class TimeFactor extends Mod {
             ImageButton settingsBtn = new ImageButton(Icon.settings);
             settingsBtn.clicked(() -> settingsDialog.showDialog());
             styleButton(settingsBtn);
+            settingsBtn.addListener(new Tooltip(t -> {
+                t.background(Tex.pane);
+                t.add(Localization.get("tf.settings.tooltip"));
+            }));
 
             // Speed display label
             Label label = new Label(positionController.pos2str());
@@ -134,6 +140,10 @@ public class TimeFactor extends Mod {
             ImageButton resetBtn = new ImageButton(Icon.refresh);
             resetBtn.clicked(this::reset);
             styleButton(resetBtn);
+            resetBtn.addListener(new Tooltip(t -> {
+                t.background(Tex.pane);
+                t.add(Localization.get("tf.reset.tooltip"));
+            }));
 
             // Collapse button
             ImageButton collapseBtn = new ImageButton(Icon.upOpenSmall);
@@ -142,6 +152,10 @@ public class TimeFactor extends Mod {
                 expanded = false;
                 switchUI();
             });
+            collapseBtn.addListener(new Tooltip(t -> {
+                t.background(Tex.pane);
+                t.add(Localization.get("tf.collapse.tooltip"));
+            }));
 
             // Add components
             panel.add(settingsBtn).size(40, 40).padRight(5);
@@ -161,6 +175,10 @@ public class TimeFactor extends Mod {
      */
     private Table createUICollapsed() {
         Table container = new Table();
+        container.addListener(new Tooltip(t -> {
+            t.background(Tex.pane);
+            t.add(Localization.get("tf.expand.tooltip"));
+        }));
 
         container.table(Tex.pane, panel -> {
             panel.name = "time-control-ui-collapsed";

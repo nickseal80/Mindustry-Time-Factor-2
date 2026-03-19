@@ -2,10 +2,14 @@ package org.seal.mindustry.timeFactor.ui;
 
 import arc.scene.ui.Label;
 import arc.scene.ui.TextButton;
+import arc.scene.ui.Tooltip;
 import arc.util.Align;
+import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 import org.seal.mindustry.timeFactor.api.SettingsController;
+import org.seal.mindustry.timeFactor.util.Localization;
 import org.seal.mindustry.timeFactor.util.TimeSpeedFormat;
+import arc.graphics.Color;
 
 public class SettingsDialog implements UIComponent<BaseDialog> {
     private final SettingsController controller;
@@ -28,7 +32,7 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
     }
 
     private BaseDialog createDialog() {
-        BaseDialog dlg = new BaseDialog("Settings");
+        BaseDialog dlg = new BaseDialog(Localization.get("tf.settings.title"));
 
         // Создаём компоненты с начальными значениями из контроллера
         minRangeSlider = createRangeSlider("minPos", -6, 0);
@@ -49,25 +53,25 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
         }).growX().pad(10);
 
         // Кнопки
-        TextButton okBtn = new TextButton("Ok");
+        TextButton okBtn = new TextButton(Localization.get("tf.settings.save"));
         okBtn.clicked(dlg::hide);
 
-        TextButton cancelBtn = new TextButton("Cancel");
+        TextButton cancelBtn = new TextButton(Localization.get("tf.settings.cancel"));
         cancelBtn.clicked(() -> {
             // Отменяем изменения - перезагружаем из контроллера
             updateUI();
             dlg.hide();
         });
 
-        TextButton resetBtn = new TextButton("Reset to Defaults");
+        TextButton resetBtn = new TextButton(Localization.get("tf.settings.reset"));
         resetBtn.clicked(() -> {
             controller.setMinPos(-4);
             controller.setMaxPos(4);
         });
 
         dlg.buttons.add(resetBtn).size(140, 50).pad(5);
-        dlg.buttons.add(cancelBtn).size(100, 50).pad(5);
-        dlg.buttons.add(okBtn).size(100, 50).pad(5);
+        dlg.buttons.add(cancelBtn).size(140, 50).pad(5);
+        dlg.buttons.add(okBtn).size(140, 50).pad(5);
 
         return dlg;
     }
@@ -96,6 +100,19 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
                 controller.setMaxPos(value);
             }
         });
+
+        slider.addListener(new Tooltip(t -> {
+            t.table(Tex.pane, tooltip -> {
+                String titleKey = key.equals("minPos") ?
+                        "tf.settings.min" : "tf.settings.max";
+                String tooltipKey = key.equals("minPos") ?
+                        "tf.settings.min.tooltip" : "tf.settings.max.tooltip";
+
+                tooltip.add(Localization.get(titleKey)).pad(5).row();
+                tooltip.add(Localization.format(tooltipKey, TimeSpeedFormat.pos2str(min), TimeSpeedFormat.pos2str(max)))
+                        .color(Color.gray).pad(3);
+            });
+        }));
 
         return slider;
     }
