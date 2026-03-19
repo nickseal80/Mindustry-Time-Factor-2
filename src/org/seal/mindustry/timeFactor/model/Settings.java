@@ -19,6 +19,8 @@ public class Settings implements SettingsController {
 
         /** Maximum speed position (positive = faster speeds) */
         public int maxPos = 4;
+
+        public boolean showTooltips = true;
     }
 
     private BaseSettings settings;
@@ -38,6 +40,7 @@ public class Settings implements SettingsController {
                 json.writeObjectStart();
                 json.writeValue("minPos", object.minPos);
                 json.writeValue("maxPos", object.maxPos);
+                json.writeValue("showTooltips", object.showTooltips);
                 json.writeObjectEnd();
             }
 
@@ -46,6 +49,7 @@ public class Settings implements SettingsController {
                 BaseSettings settings = new BaseSettings();
                 settings.minPos = json.readValue("minPos", Integer.class, jsonValue);
                 settings.maxPos = json.readValue("maxPos", Integer.class, jsonValue);
+                settings.showTooltips = json.readValue("showTooltips", Boolean.class, jsonValue);
                 return settings;
             }
         });
@@ -127,6 +131,20 @@ public class Settings implements SettingsController {
     public void setMaxPos(int maxPos) {
         if (settings.maxPos != maxPos) {
             settings.maxPos = maxPos;
+            saveSettings();
+            notifyListeners();
+        }
+    }
+
+    @Override
+    public boolean isShowTooltips() {
+        return settings.showTooltips;
+    }
+
+    @Override
+    public void setShowTooltips(boolean showTooltips) {
+        if (settings.showTooltips != showTooltips) {
+            settings.showTooltips = showTooltips;
             saveSettings();
             notifyListeners();
         }

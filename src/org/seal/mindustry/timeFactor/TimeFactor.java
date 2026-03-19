@@ -1,11 +1,14 @@
 package org.seal.mindustry.timeFactor;
 
 import arc.Core;
+import arc.scene.Element;
 import arc.scene.actions.Actions;
+import arc.scene.event.EventListener;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
 import arc.scene.ui.Tooltip;
 import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Log;
 import arc.util.Time;
@@ -38,6 +41,8 @@ public class TimeFactor extends Mod {
     private TimeSliderView sliderView;
     private SettingsDialog settingsDialog;
 
+    private boolean showTooltips;
+
     private boolean expanded = true;
     private Table main;
     private Table collapsedMain;
@@ -47,6 +52,11 @@ public class TimeFactor extends Mod {
 
     // Лейбл для свёрнутого режима (нужен для обновления)
     private Label collapsedLabel;
+
+    // Сохраняем ссылки на компоненты для обновления тултипов
+    private ImageButton settingsBtn;
+    private ImageButton resetBtn;
+    private ImageButton collapseBtn;
 
     /**
      * Updates the game's delta time provider based on the current speed position.
@@ -93,9 +103,13 @@ public class TimeFactor extends Mod {
             sliderModel.setValue(newPosition);
         });
 
-        // Update slider model when settings change
+        // Update slider model and tooltips when settings change
         settingsController.addListener(settings -> {
             sliderModel.setRange(settings.minPos, settings.maxPos);
+            showTooltips = settings.showTooltips;
+
+            // Обновляем тултипы при изменении настроек
+            Core.app.post(() -> updateTooltips());
         });
 
         // Create UI components
@@ -112,6 +126,52 @@ public class TimeFactor extends Mod {
     }
 
     /**
+     * Удаляет все тултипы у элемента
+     */
+    private void removeTooltips(Element element) {
+        if (element == null) return;
+
+        Seq<EventListener> listeners = element.getListeners();
+        // Идём с конца, чтобы не сбивать индексы
+        for (int i = listeners.size - 1; i >= 0; i--) {
+            if (listeners.get(i) instanceof Tooltip) {
+                listeners.remove(i);
+            }
+        }
+    }
+
+    /**
+     * Добавляет тултип к элементу
+     */
+    private void addTooltip(Element element, String text) {
+        if (element == null) return;
+
+        element.addListener(new Tooltip(t -> {
+            t.setBackground(Tex.pane);
+            t.add(text);
+        }));
+    }
+
+    /**
+     * Обновляет видимость тултипов на всех компонентах
+     */
+    private void updateTooltips() {
+        // Сначала удаляем все старые тултипы
+        removeTooltips(settingsBtn);
+        removeTooltips(resetBtn);
+        removeTooltips(collapseBtn);
+        removeTooltips(collapsedMain);
+
+        // Затем добавляем новые, если нужно
+        if (showTooltips) {
+            addTooltip(settingsBtn, Localization.get("tf.settings.tooltip"));
+            addTooltip(resetBtn, Localization.get("tf.reset.tooltip"));
+            addTooltip(collapseBtn, Localization.get("tf.collapse.tooltip"));
+            addTooltip(collapsedMain, Localization.get("tf.expand.tooltip"));
+        }
+    }
+
+    /**
      * Creates the full expanded UI with all controls.
      */
     private Table createUIFull() {
@@ -121,13 +181,22 @@ public class TimeFactor extends Mod {
             panel.name = "time-control-ui-full";
 
             // Settings button
-            ImageButton settingsBtn = new ImageButton(Icon.settings);
+            settingsBtn = new ImageButton(Icon.settings);
             settingsBtn.clicked(() -> settingsDialog.showDialog());
             styleButton(settingsBtn);
-            settingsBtn.addListener(new Tooltip(t -> {
-                t.background(Tex.pane);
-                t.add(Localization.get("tf.settings.tooltip"));
-            }));
+
+            // Reset button
+            resetBtn = new ImageButton(Icon.refresh);
+            resetBtn.clicked(this::reset);
+            styleButton(resetBtn);
+
+            // Collapse button
+            collapseBtn = new ImageButton(Icon.upOpenSmall);
+            styleButton(collapseBtn);
+            collapseBtn.clicked(() -> {
+                expanded = false;
+                switchUI();
+            });
 
             // Speed display label
             Label label = new Label(positionController.pos2str());
@@ -135,27 +204,6 @@ public class TimeFactor extends Mod {
             positionController.addListener(position ->
                     label.setText(positionController.pos2str())
             );
-
-            // Reset button
-            ImageButton resetBtn = new ImageButton(Icon.refresh);
-            resetBtn.clicked(this::reset);
-            styleButton(resetBtn);
-            resetBtn.addListener(new Tooltip(t -> {
-                t.background(Tex.pane);
-                t.add(Localization.get("tf.reset.tooltip"));
-            }));
-
-            // Collapse button
-            ImageButton collapseBtn = new ImageButton(Icon.upOpenSmall);
-            styleButton(collapseBtn);
-            collapseBtn.clicked(() -> {
-                expanded = false;
-                switchUI();
-            });
-            collapseBtn.addListener(new Tooltip(t -> {
-                t.background(Tex.pane);
-                t.add(Localization.get("tf.collapse.tooltip"));
-            }));
 
             // Add components
             panel.add(settingsBtn).size(40, 40).padRight(5);
@@ -175,10 +223,6 @@ public class TimeFactor extends Mod {
      */
     private Table createUICollapsed() {
         Table container = new Table();
-        container.addListener(new Tooltip(t -> {
-            t.background(Tex.pane);
-            t.add(Localization.get("tf.expand.tooltip"));
-        }));
 
         container.table(Tex.pane, panel -> {
             panel.name = "time-control-ui-collapsed";
@@ -246,6 +290,9 @@ public class TimeFactor extends Mod {
 
         // Добавляем в HUD
         Vars.ui.hudGroup.addChild(activeUI);
+
+        // Инициализируем тултипы согласно настройкам
+        Core.app.post(() -> updateTooltips());
 
         Log.info("TimeFactor UI rendered in " + (expanded ? "expanded" : "collapsed") + " mode");
     }

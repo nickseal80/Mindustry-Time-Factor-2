@@ -11,6 +11,8 @@ public interface SettingsController {
     void setMinPos(int minPos);
     int getMaxPos();
     void setMaxPos(int maxPos);
+    boolean isShowTooltips();
+    void setShowTooltips(boolean showTooltips);
     void addListener(SettingsListener listener);
     void removeListener(SettingsListener listener);
 }

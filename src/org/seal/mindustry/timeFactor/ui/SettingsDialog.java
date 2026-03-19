@@ -1,5 +1,6 @@
 package org.seal.mindustry.timeFactor.ui;
 
+import arc.scene.ui.CheckBox;
 import arc.scene.ui.Label;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.Tooltip;
@@ -20,6 +21,7 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
     private RangeSlider maxRangeSlider;
     private Label minRangeLabel;
     private Label maxRangeLabel;
+    private CheckBox showTooltips;
 
     public SettingsDialog(SettingsController controller) {
         this.controller = controller;
@@ -37,18 +39,28 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
         // Создаём компоненты с начальными значениями из контроллера
         minRangeSlider = createRangeSlider("minPos", -6, 0);
         maxRangeSlider = createRangeSlider("maxPos", 0, 6);
+
         minRangeLabel = createRangeLabel("minPos");
         maxRangeLabel = createRangeLabel("maxPos");
+
+        showTooltips = new CheckBox(Localization.get("tf.settings.showTooltips"));
+        showTooltips.setChecked(controller.isShowTooltips());
+        showTooltips.changed(() -> {
+            controller.setShowTooltips(showTooltips.isChecked());
+        });
 
         dlg.cont.table(grid -> {
             grid.defaults().pad(5);
 
-            grid.add(minRangeSlider);
+            grid.add(minRangeSlider).left();
             grid.add(minRangeLabel).width(60).right();
             grid.row();
 
-            grid.add(maxRangeSlider);
+            grid.add(maxRangeSlider).left();
             grid.add(maxRangeLabel).width(60).right();
+            grid.row();
+
+            grid.add(showTooltips).colspan(2).left();
             grid.row();
         }).growX().pad(10);
 
@@ -82,6 +94,7 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
         maxRangeSlider.setIntValue(controller.getMaxPos());
         minRangeLabel.setText(TimeSpeedFormat.pos2str(controller.getMinPos()));
         maxRangeLabel.setText(TimeSpeedFormat.pos2str(controller.getMaxPos()));
+        showTooltips.setChecked(controller.isShowTooltips());
     }
 
     private RangeSlider createRangeSlider(String key, int min, int max) {
