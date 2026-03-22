@@ -16,7 +16,7 @@ repo: "https://github.com/nickseal80/Mindustry-Time-Factor-2"
 description: "Real-time speed control for Mindustry. Customize speed limits and reset instantly with a clean UI."
 
 #the mod version
-version: 2.1
+version: 2.2
 
 #the minimum game build required to run this mod
 minGameVersion: 154

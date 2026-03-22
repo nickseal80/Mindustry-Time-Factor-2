@@ -112,14 +112,13 @@ tasks.register('deploy') {
         def sourceFile = file("build/libs/timeFactorDesktop.jar")
         def targetFile = file("$modsDir/timeFactorDesktop.jar")
 
-        println "Копирование мода в: $targetFile"
         copy {
             from sourceFile
             into modsDir
             rename { "timeFactor.jar" }
         }
 
-        println "✅ Мод скопирован! Запустите Mindustry вручную."
+        println "Mod copied successfully"
     }
 }
 

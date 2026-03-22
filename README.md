@@ -1,6 +1,6 @@
 # Time Factor - Mindustry Speed Control Mod
 
-[![Version](https://img.shields.io/badge/version-2.1-blue.svg)](https://github.com/seal/mindustry-time-factor)
+[![Version](https://img.shields.io/badge/version-2.2-blue.svg)](https://github.com/seal/mindustry-time-factor)
 [![Mindustry](https://img.shields.io/badge/Mindustry-7.0+-brightgreen.svg)](https://github.com/Anuken/Mindustry)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
