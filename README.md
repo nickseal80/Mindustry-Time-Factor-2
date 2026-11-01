@@ -55,6 +55,6 @@ A lightweight and intuitive speed control mod for Mindustry that lets you adjust
 ### Settings Dialog
 
 The settings dialog allows you to:
-- Adjust the minimum speed (e.g., -6 for 1/64x)
-- Adjust the maximum speed (e.g., 6 for 64x)
+- Adjust the minimum speed (e.g., -8 for 1/256x)
+- Adjust the maximum speed (e.g., 8 for 256x)
 - Changes are saved automatically
