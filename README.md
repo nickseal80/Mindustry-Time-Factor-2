@@ -22,15 +22,23 @@ A lightweight and intuitive speed control mod for Mindustry that lets you adjust
 
 | Position | Speed | Display |
 |:--------:|:-----:|:-------:|
-| -4 | 1/16x | x1/16 |
-| -3 | 1/8x  | x1/8  |
-| -2 | 1/4x  | x1/4  |
-| -1 | 1/2x  | x1/2  |
-| 0  | 1x    | x1    |
-| 1  | 2x    | x2    |
-| 2  | 4x    | x4    |
-| 3  | 8x    | x8    |
-| 4  | 16x   | x16   |
+| -8 | 1/256x | x1/256 |
+| -7 | 1/128x | x1/128 |
+| -6 | 1/64x  | x1/64  |
+| -5 | 1/32x  | x1/32  |
+| -4 | 1/16x  | x1/16  |
+| -3 | 1/8x   | x1/8   |
+| -2 | 1/4x   | x1/4   |
+| -1 | 1/2x   | x1/2   |
+| 0  | 1x     | x1     |
+| 1  | 2x     | x2     |
+| 2  | 4x     | x4     |
+| 3  | 8x     | x8     |
+| 4  | 16x    | x16    |
+| 5  | 32x    | x32    |
+| 6  | 64x    | x64    |
+| 7  | 128x   | x128   |
+| 8  | 256x   | x256   |
 
 *Note: The range can be extended up to ±6 (1/64x to 64x) through settings.*
 
