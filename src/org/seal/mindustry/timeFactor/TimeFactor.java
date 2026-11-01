@@ -1,12 +1,13 @@
 package org.seal.mindustry.timeFactor;
 
 import arc.Core;
+import arc.input.KeyCode;
 import arc.scene.Element;
 import arc.scene.actions.Actions;
+import arc.scene.event.ClickListener;
 import arc.scene.event.EventListener;
-import arc.scene.ui.ImageButton;
-import arc.scene.ui.Label;
-import arc.scene.ui.Tooltip;
+import arc.scene.event.InputEvent;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Align;
@@ -52,6 +53,8 @@ public class TimeFactor extends Mod {
 
     // Лейбл для свёрнутого режима (нужен для обновления)
     private Label collapsedLabel;
+    private TextButton collapsedDecButton;
+    private TextButton collapsedIncButton;
 
     // Сохраняем ссылки на компоненты для обновления тултипов
     private ImageButton settingsBtn;
@@ -65,8 +68,11 @@ public class TimeFactor extends Mod {
     private void updateGameSpeed(int position) {
         float speed = TimeSpeedFormat.getMultiplier(position);
         Time.setDeltaProvider(() -> {
-            float delta = Core.graphics.getDeltaTime();
-            return Math.min(delta * 60 * speed, 3 * speed);
+//            float delta = Core.graphics.getDeltaTime();
+//            return Math.min(delta * 60 * speed, 3 * speed);
+
+            float delta = Core.graphics.getDeltaTime() * 60f * speed;
+            return Math.min(delta, 10f * speed);
         });
     }
 
@@ -221,11 +227,85 @@ public class TimeFactor extends Mod {
     /**
      * Creates the collapsed UI with only speed display.
      */
+//    private Table createUICollapsed() {
+//        Table container = new Table();
+//
+//        container.table(Tex.pane, panel -> {
+//            panel.name = "time-control-ui-collapsed";
+//
+//            // Decrement button
+//            collapsedDecButton = new TextButton("<");
+//            collapsedDecButton.clicked(() -> {
+//                int newValue = positionController.getPosition() - 1;
+//                sliderModel.setValue(newValue);
+//            });
+//
+//            // IncrementButton
+//            collapsedIncButton = new TextButton(">");
+//            collapsedIncButton.clicked(() -> {
+//                int newValue = positionController.getPosition() + 1;
+//                sliderModel.setValue(newValue);
+//            });
+//
+//            TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(collapsedDecButton.getStyle());
+//            style.up = null;
+//            style.over = null;
+//            style.down = null;
+//
+//            collapsedDecButton.setStyle(style);
+//            collapsedIncButton.setStyle(style);
+//
+//            // Speed label
+//            collapsedLabel = new Label(positionController.pos2str());
+//            collapsedLabel.setAlignment(Align.center);
+//
+//            positionController.addListener(position ->
+//                    collapsedLabel.setText(positionController.pos2str())
+//            );
+//
+//            // Делаем панель кликабельной с курсором-рукой
+////            panel.clicked(() -> {
+////                expanded = true;
+////                switchUI();
+////            });
+//
+//            panel.add(collapsedDecButton).size(30, 40);
+//            panel.add(collapsedLabel).size(60, 40).pad(5);
+//            panel.add(collapsedIncButton).size(30, 40);
+//
+//        }).pad(10).size(170, 60);
+//
+//        container.left().bottom();
+//        return container;
+//    }
+
     private Table createUICollapsed() {
         Table container = new Table();
 
         container.table(Tex.pane, panel -> {
             panel.name = "time-control-ui-collapsed";
+
+            // Decrement button
+            collapsedDecButton = new TextButton("<");
+            collapsedDecButton.clicked(() -> {
+                int newValue = positionController.getPosition() - 1;
+                sliderModel.setValue(newValue);
+            });
+
+            // IncrementButton
+            collapsedIncButton = new TextButton(">");
+            collapsedIncButton.clicked(() -> {
+                int newValue = positionController.getPosition() + 1;
+                sliderModel.setValue(newValue);
+            });
+
+            TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(collapsedDecButton.getStyle());
+            style.up = null;
+            style.over = null;
+            style.down = null;
+
+            collapsedDecButton.setStyle(style);
+            collapsedIncButton.setStyle(style);
 
             // Speed label
             collapsedLabel = new Label(positionController.pos2str());
@@ -235,15 +315,33 @@ public class TimeFactor extends Mod {
                     collapsedLabel.setText(positionController.pos2str())
             );
 
-            // Делаем панель кликабельной с курсором-рукой
-            panel.clicked(() -> {
-                expanded = true;
-                switchUI();
+            // Добавляем элементы на панель
+            panel.add(collapsedDecButton).size(30, 40);
+            panel.add(collapsedLabel).size(60, 40).pad(5);
+            panel.add(collapsedIncButton).size(30, 40);
+
+            // --- ДОБАВЛЯЕМ КЛИК ПО ПАНЕЛИ ---
+            panel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    // Проверяем локальные координаты x и y.
+                    // Если клик НЕ попал в область кнопок — разворачиваем панель.
+                    // (Клик по лейблу или пустому месту будет работать)
+
+                    boolean clickedDec = x >= collapsedDecButton.x && x <= collapsedDecButton.x + collapsedDecButton.getWidth() &&
+                            y >= collapsedDecButton.y && y <= collapsedDecButton.y + collapsedDecButton.getHeight();
+
+                    boolean clickedInc = x >= collapsedIncButton.x && x <= collapsedIncButton.x + collapsedIncButton.getWidth() &&
+                            y >= collapsedIncButton.y && y <= collapsedIncButton.y + collapsedIncButton.getHeight();
+
+                    if (!clickedDec && !clickedInc) {
+                        expanded = true;
+                        switchUI();
+                    }
+                }
             });
 
-            panel.add(collapsedLabel).size(60, 40).pad(5);
-
-        }).pad(10).size(100, 60);
+        }).pad(10).size(170, 60);
 
         container.left().bottom();
         return container;

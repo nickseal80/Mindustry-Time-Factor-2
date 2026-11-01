@@ -37,8 +37,8 @@ public class SettingsDialog implements UIComponent<BaseDialog> {
         BaseDialog dlg = new BaseDialog(Localization.get("tf.settings.title"));
 
         // Создаём компоненты с начальными значениями из контроллера
-        minRangeSlider = createRangeSlider("minPos", -6, 0);
-        maxRangeSlider = createRangeSlider("maxPos", 0, 6);
+        minRangeSlider = createRangeSlider("minPos", -8, 0);
+        maxRangeSlider = createRangeSlider("maxPos", 0, 8);
 
         minRangeLabel = createRangeLabel("minPos");
         maxRangeLabel = createRangeLabel("maxPos");
